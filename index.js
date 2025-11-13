@@ -1,5 +1,7 @@
 const express = require('express');
 const Cors = require('cors');
+// const admin = require('firebase-admin');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = 3100;
@@ -9,7 +11,8 @@ app.use(Cors({
 
 app.use(express.json());
 
-const uri = "mongodb+srv://foodreviews:lcv46MXvkmygwEQd@cluster0.0glyfyp.mongodb.net/?appName=Cluster0";
+
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.0glyfyp.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -23,7 +26,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 const db = client.db('Foodreview')
 const reviewsCollection = db.collection('Foodreviews')
 const myfavouritesCollection = db.collection('Myfavourites')
@@ -46,7 +49,6 @@ const result = await reviewsCollection.findOne({_id: objectId})
 })
 app.get('/top-ratedreviews',async(req,res)=>{
   const result = await reviewsCollection.find().sort({"reviewer.rating":-1}).limit(6).toArray();
-
    res.send(result)
 })
 app.get('/myreviews',async(req,res)=>{
@@ -134,16 +136,13 @@ app.get('/search', async (req, res) => {
 })
 
 
-await client.db("admin").command({ ping: 1 });
+// await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   }
    finally {
 
    }
 }
-run().catch(console.dir);
-
-
 
 run().catch(console.dir);
 app.get('/', (req, res)=>{
