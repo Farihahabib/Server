@@ -26,6 +26,7 @@ async function run() {
     await client.connect();
 const db = client.db('Foodreview')
 const reviewsCollection = db.collection('Foodreviews')
+const myfavouritesCollection = db.collection('Myfavourites')
 
  app.get('/reviews',async(req,res)=>{
  const result = await reviewsCollection.find().toArray();
@@ -43,7 +44,17 @@ const result = await reviewsCollection.findOne({_id: objectId})
     
   })
 })
+app.get('/top-ratedreviews',async(req,res)=>{
+  const result = await reviewsCollection.find().sort({"reviewer.rating":-1}).limit(6).toArray();
 
+   res.send(result)
+})
+app.get('/myreviews',async(req,res)=>{
+  const email = req.query.email;
+  console.log(email)
+  const result = await reviewsCollection.find({created_by: email}).toArray();
+  res.send(result)
+})
 
 
  app.post('/reviews',async(req,res)=>{
@@ -55,8 +66,41 @@ res.send({
   result
 })
  })
+app.post('/myfavourites',async(req,res)=>{
+  const data = req.body
+  console.log(data)
+  const result = await myfavouritesCollection.insertOne(data)
+  res.send(result)
+})
+app.get('/my-favourites',async(req,res)=>{
+  const email = req.query.email;
+  console.log(email)
+  const result = await myfavouritesCollection.find({
+favourites_by: email}).toArray();
+  res.send(result)
+})
+app.put('/reviews/:id',async(req,res)=>{
+  const {id} = req.params;
+   const data = req.body;
+  const objectID = new ObjectId(id)
+const filter = {_id: objectID}
+const update = {
+  $set:data
+}
+ const result = await reviewsCollection.updateOne(filter,update)
+  res.send({
+    success:true,
+    result
+  })
+})
+app.delete('/reviews/:id',async(req,res)=>{
+  const {id} = req.params
+const objectId = new ObjectId(id)
+const filter = {_id: objectId}
+  const result = await reviewsCollection.deleteOne(filter)
+  res.send(result)
 
-
+})
 
 await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
