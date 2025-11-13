@@ -110,11 +110,30 @@ const filter = {_id: objectId}
   res.send(result)
 
 })
-app.get('/search',async(req,res)=>{
-     const searchText = req.query.search;
-     const result = await reviewsCollection.find({name:{$regex: searchText, $options:"i"}}).toArray();
-     res.send(result)
+
+
+
+
+app.get('/search', async (req, res) => {
+  try {
+    const searchText = req.query.searchText || ""; // undefined হলে empty string
+    let result;
+
+    if (!searchText) {
+      result = await reviewsCollection.find({}).toArray(); // খালি input → সব review
+    } else {
+      result = await reviewsCollection
+        .find({ foodName: { $regex: searchText, $options: "i" } })
+        .toArray();
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Server Error" });
+  }
 })
+
 
 await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
