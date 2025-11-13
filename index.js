@@ -83,7 +83,6 @@ app.post('/myfavourites',async(req,res)=>{
 })
 app.get('/my-favourites',async(req,res)=>{
   const email = req.query.email;
-  console.log(email)
   const result = await myfavouritesCollection.find({
 favourites_by: email}).toArray();
   res.send(result)
