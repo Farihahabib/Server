@@ -70,7 +70,16 @@ app.post('/myfavourites',async(req,res)=>{
   const data = req.body
   console.log(data)
   const result = await myfavouritesCollection.insertOne(data)
-  res.send(result)
+ const filter = {_id: new ObjectId(data._id)}
+ const update = {
+  $inc:
+  {
+    favourites: 1
+  }
+ }
+ const favouriteCount = await reviewsCollection.updateOne(filter,update)
+
+  res.send(result,favouriteCount)
 })
 app.get('/my-favourites',async(req,res)=>{
   const email = req.query.email;
@@ -100,6 +109,11 @@ const filter = {_id: objectId}
   const result = await reviewsCollection.deleteOne(filter)
   res.send(result)
 
+})
+app.get('/search',async(req,res)=>{
+     const searchText = req.query.search;
+     const result = await reviewsCollection.find({name:{$regex: searchText, $options:"i"}}).toArray();
+     res.send(result)
 })
 
 await client.db("admin").command({ ping: 1 });
