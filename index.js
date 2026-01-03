@@ -132,28 +132,29 @@ async function run() {
       const result = await usersCollection.insertOne(userData);
       res.json(result);
     });
+    
 app.get('/user/role/',verifyJWT, async (req, res) => {
      const result = await usersCollection.findOne({ email: req.tokenEmail })
       res.send({ role: result?.role })
       console.log(result)
  })
-// Update role
-app.patch('/users/:id/role',verifyJWT, async (req, res) => {
-  const { role } = req.body;
-  const { id } = req.params;
-  const result = await usersCollection.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: { role } }
-  );
-  res.send(result);
-});
+// // Update role
+// app.patch('/users/:id/role',verifyJWT, async (req, res) => {
+//   const { role } = req.body;
+//   const { id } = req.params;
+//   const result = await usersCollection.updateOne(
+//     { _id: new ObjectId(id) },
+//     { $set: { role } }
+//   );
+//   res.send(result);
+// });
 
-// Delete user
-app.delete('/users/:id',verifyJWT, async (req, res) => {
-  const { id } = req.params;
-  const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
-  res.send(result);
-});
+// // Delete user
+// app.delete('/users/:id',verifyJWT, async (req, res) => {
+//   const { id } = req.params;
+//   const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
+//   res.send(result);
+// });
 
     // ==================== SEARCH ====================
     app.get('/search', async (req, res) => {
