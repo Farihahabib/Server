@@ -30,7 +30,7 @@ async function run() {
 const db = client.db('Foodreview')
 const reviewsCollection = db.collection('Foodreviews')
 const myfavouritesCollection = db.collection('Myfavourites')
-
+const usersCollection = db.collection('UsersCollections')
  app.get('/reviews',async(req,res)=>{
  const result = await reviewsCollection.find().toArray();
   res.send(result)
@@ -111,7 +111,35 @@ const filter = {_id: objectId}
   res.send(result)
 
 })
+//save users
+//save users in database
+ app.post('/users', async (req, res) => {
+      const userData = req.body
+      userData.created_at = new Date().toISOString()
+      userData.last_loggedIn = new Date().toISOString()
+      userData.role = 'User'
 
+      const query = {
+        email: userData.email,
+      }
+
+      const alreadyExists = await usersCollection.findOne(query)
+      console.log('User Already Exists---> ', !!alreadyExists)
+
+      if (alreadyExists) {
+        console.log('Updating user info......')
+        const result = await usersCollection.updateOne(query, {
+          $set: {
+            last_loggedIn: new Date().toISOString(),
+          },
+        })
+        return res.send(result)
+      }
+
+      console.log('Saving new user info......')
+      const result = await usersCollection.insertOne(userData)
+      res.send(result)
+    })
 
 
 
